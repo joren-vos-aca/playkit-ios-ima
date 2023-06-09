@@ -65,7 +65,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
     
     weak public var dataSource: AdsPluginDataSource? {
         didSet {
-            PKLog.debug("data source set")
         }
     }
     weak public var delegate: AdsPluginDelegate?
@@ -128,7 +127,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
     
     @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         guard let imaConfig = pluginConfig as? IMAConfig else {
-            PKLog.error("missing plugin config")
             throw PKPluginError.missingPluginConfig(pluginName: IMAPlugin.pluginName)
         }
         
@@ -174,7 +172,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {
-        PKLog.debug("pluginConfig: " + String(describing: pluginConfig))
         
         super.onUpdateConfig(pluginConfig: pluginConfig)
         
@@ -224,7 +221,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
         guard let playerView = self.player?.view else { throw IMAPluginRequestError.missingPlayerView }
         
         if self.config.adTagUrl.isEmpty && self.config.adsResponse.isEmpty {
-            PKLog.debug("Can't request ads, at least one of adTagUrl and adsResponse must be provided.")
             throw IMAPluginRequestError.emptyAdTag
         }
         
@@ -272,7 +268,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
             self.createLoader()
         }
         // request ads
-        PKLog.debug("request Ads")
         IMAPlugin.loader.requestAds(with: request)
         // notify ads requested
         self.notify(event: AdEvent.AdsRequested(adTagUrl: self.config.adTagUrl))
@@ -282,7 +277,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
             guard let self = self else { return }
             
             if self.adsManager == nil {
-                PKLog.debug("Ads request timed out")
                 switch self.stateMachine.getState() {
                 case .adsRequested: self.delegate?.adsRequestTimedOut(shouldPlay: false)
                 case .adsRequestedAndPlay: self.delegate?.adsRequestTimedOut(shouldPlay: true)
@@ -388,14 +382,12 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
         IMAPlugin.loader = nil
         if (adErrorData.adError.code.rawValue == 1005 || adErrorData.adError.code.rawValue == 1010) && self.loaderRetries > 0 {
             self.loaderRetries -= 1
-            PKLog.info("Retrying to load Ad. Attempts left: \(self.loaderRetries)")
             try? self.requestAds()
         } else {
             self.stateMachine.set(state: .adsRequestFailed)
             
             let adErrorMessage: String = adErrorData.adError.message ?? ""
             
-            PKLog.error(adErrorMessage)
             self.messageBus?.post(AdEvent.Error(nsError: IMAPluginError(adError: adErrorData.adError).asNSError))
             self.delegate?.adsPlugin(self, loaderFailedWith: adErrorMessage)
         }
@@ -414,7 +406,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
     }
     
     @objc public func adsManager(_ adsManager: IMAAdsManager, didReceive event: IMAAdEvent) {
-        PKLog.trace("ads manager event: " + String(describing: event))
         let currentState = self.stateMachine.getState()
         
         switch event.type {
@@ -548,7 +539,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
     }
     
     @objc public func adsManager(_ adsManager: IMAAdsManager, didReceive error: IMAAdError) {
-        PKLog.error(error.message)
         self.messageBus?.post(AdEvent.Error(nsError: IMAPluginError(adError: error).asNSError))
         self.delegate?.adsPlugin(self, managerFailedWith: error.message ?? "")
     }
@@ -629,7 +619,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
     
     private func initAdsManager() {
         self.adsManager!.initialize(with: self.renderingSettings)
-        PKLog.debug("ads manager set")
         self.notifyAdCuePoints(fromAdsManager: self.adsManager!)
     }
     
@@ -673,7 +662,6 @@ enum IMAState: Int, StateProtocol, CustomStringConvertible {
     }
     
     private func discardAdBreak(adsManager: IMAAdsManager) {
-        PKLog.debug("discard Ad Break")
         adsManager.discardAdBreak()
         self.adsManagerDidRequestContentResume(adsManager)
     }

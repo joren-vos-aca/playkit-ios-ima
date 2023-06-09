@@ -18,7 +18,6 @@ import PlayKit
             return avPlayerWrapper.currentPlayer
         } else {
             // This workaround we need for not to use force unwpapping.
-            PKLog.error("AdsDAIPlayerEngineWrapper playerEngine should be always AVPlayerWrapper type.")
             return AVPlayer()
         }
     }

@@ -4,12 +4,12 @@ suffix = '.0000'   # Dev mode
 
 Pod::Spec.new do |s|
   s.name             = 'PlayKit_IMA'
-  s.version          = '1.14.0' + suffix
+  s.version          = '1.14.1' + suffix
   s.author           = { 'Kaltura' => 'community@kaltura.com' }
   s.license          = { :type => 'AGPLv3', :text => 'AGPLv3' }
   s.summary          = 'PlayKit IMA Plugin'
-  s.homepage         = 'https://github.com/kaltura/playkit-ios-ima'
-  s.source           = { :git => 'https://github.com/kaltura/playkit-ios-ima.git', :tag => 'v' + s.version.to_s }
+  s.homepage         = 'https://github.com/joren-vos-aca/playkit-ios-ima'
+  s.source           = { :git => 'git@github.com:joren-vos-aca/playkit-ios-ima.git', :tag => 'v' + s.version.to_s }
   s.swift_version    = '5.0'
   
   s.ios.deployment_target = '12.0'

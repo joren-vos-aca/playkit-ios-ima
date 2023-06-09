@@ -60,7 +60,6 @@ import PlayKitUtils
     
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         guard let imaDAIConfig = pluginConfig as? IMADAIConfig else {
-            PKLog.error("Missing plugin config")
             throw PKPluginError.missingPluginConfig(pluginName: IMADAIPlugin.pluginName)
         }
         
@@ -79,7 +78,6 @@ import PlayKitUtils
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {
-        PKLog.debug("pluginConfig: " + String(describing: pluginConfig))
         
         super.onUpdateConfig(pluginConfig: pluginConfig)
         
@@ -177,7 +175,6 @@ import PlayKitUtils
     
     weak public var dataSource: AdsPluginDataSource? {
         didSet {
-            PKLog.debug("data source set")
         }
     }
     
@@ -247,7 +244,6 @@ import PlayKitUtils
             createAdsLoader()
         }
         
-        PKLog.debug("Request Ads")
         IMADAIPlugin.adsLoader.requestStream(with: request)
         stateMachine.set(state: .adsRequested)
         notify(event: AdEvent.AdsRequested())
@@ -256,7 +252,6 @@ import PlayKitUtils
             guard let strongSelf = self else { return }
             
             if strongSelf.streamManager == nil {
-                PKLog.debug("Ads request timed out")
                 switch strongSelf.stateMachine.getState() {
                 case .adsRequested:
                     strongSelf.delegate?.adsRequestTimedOut(shouldPlay: false)
@@ -421,7 +416,6 @@ import PlayKitUtils
         
         let adErrorMessage: String = adErrorData.adError.message ?? ""
         
-        PKLog.error(adErrorMessage)
         messageBus?.post(AdEvent.Error(nsError: IMAPluginError(adError: adErrorData.adError).asNSError))
         delegate?.adsPlugin(self, loaderFailedWith: adErrorMessage)
     }
@@ -431,7 +425,6 @@ import PlayKitUtils
     /************************************************************/
     
     public func streamManager(_ streamManager: IMAStreamManager, didReceive event: IMAAdEvent) {
-        PKLog.trace("Stream manager event: " + event.typeString)
         
         switch event.type {
         case .CUEPOINTS_CHANGED:
@@ -531,7 +524,6 @@ import PlayKitUtils
     }
     
     public func streamManager(_ streamManager: IMAStreamManager, didReceive error: IMAAdError) {
-        PKLog.error(error.message)
         self.messageBus?.post(AdEvent.Error(nsError: IMAPluginError(adError: error).asNSError))
         self.delegate?.adsPlugin(self, managerFailedWith: error.message ?? "")
     }
